@@ -1,0 +1,111 @@
+name: CI Retrain and Publish BigOracle
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "MLProject/**"
+      - "scripts/**"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:   # dapat dipicu manual dari tab Actions
+
+permissions:
+  contents: write      # diperlukan untuk menyimpan artefak ke repositori ini
+
+env:
+  MLFLOW_EXPERIMENT: BigOracle_CI
+  IMAGE_NAME: bigoracle-model
+
+jobs:
+  retrain-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      # 2. run actions/checkout@v3
+      - uses: actions/checkout@v3
+
+      # 3. set up python 3.12.7  (+ "Post Set up Python 3.12.7" otomatis karena cache pip aktif)
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.7"
+          cache: pip
+          cache-dependency-path: MLProject/requirements.txt
+
+      # 4. check env
+      - name: Check Env
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "Python  : $(python --version)"
+          echo "Pip     : $(pip --version)"
+          echo "Docker  : $(docker --version)"
+          echo "Working dir: $(pwd)"
+          ls -la MLProject
+          test -f MLProject/MLProject                              || { echo "MLProject/MLProject tidak ada"; exit 1; }
+          test -f MLProject/codecomplex_preprocessing/train.csv    || { echo "train.csv tidak ada di MLProject/codecomplex_preprocessing"; exit 1; }
+          test -f MLProject/codecomplex_preprocessing/test.csv     || { echo "test.csv tidak ada di MLProject/codecomplex_preprocessing"; exit 1; }
+          test -n "$DOCKERHUB_USERNAME" || { echo "Secret DOCKERHUB_USERNAME belum diatur"; exit 1; }
+          test -n "$DOCKERHUB_TOKEN"    || { echo "Secret DOCKERHUB_TOKEN belum diatur"; exit 1; }
+          echo "Environment OK"
+
+      # 5. install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r MLProject/requirements.txt
+          mlflow --version
+
+      # (Skilled) 6. set mlflow tracking URI
+      - name: Set MLflow Tracking URI
+        run: echo "MLFLOW_TRACKING_URI=sqlite:///${{ github.workspace }}/mlflow.db" >> "$GITHUB_ENV"
+
+      # 6/7. run mlflow project
+      - name: Run mlflow project
+        run: mlflow run MLProject --env-manager=local --experiment-name "$MLFLOW_EXPERIMENT"
+
+      # 7/8. get latest mlflow run_id
+      - name: Get latest MLflow run_id
+        run: |
+          python scripts/ci_utils.py latest-run --experiment "$MLFLOW_EXPERIMENT" >> "$GITHUB_ENV"
+          echo "Run terbaru: $(grep '^RUN_ID=' "$GITHUB_ENV" | tail -1)"
+
+      # 8/9. install python dependencies (untuk ringkasan metrik dan pengumpulan artefak)
+      - name: Install Python dependencies
+        run: pip install tabulate
+
+      # 9/10. upload ke GitHub (pengganti "upload to google drive")
+      - name: Upload to GitHub
+        run: |
+          python scripts/ci_utils.py collect --run-id "$RUN_ID" --out artifacts/latest
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan artefak."
+          else
+            git commit -m "ci: simpan artefak MLflow run $RUN_ID [skip ci]"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+
+      # 10. build docker model (mlflow build-docker)
+      - name: Build Docker Model
+        run: mlflow models build-docker --model-uri "runs:/${RUN_ID}/model" --name "$IMAGE_NAME"
+
+      # 11. log in to docker hub  (+ "Post Log in to Docker Hub" otomatis)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 12. tag docker image (lalu dikirim ke Docker Hub)
+      - name: Tag Docker Image
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker tag "$IMAGE_NAME" "$DOCKERHUB_USERNAME/$IMAGE_NAME:latest"
+          docker tag "$IMAGE_NAME" "$DOCKERHUB_USERNAME/$IMAGE_NAME:$RUN_ID"
+          docker push "$DOCKERHUB_USERNAME/$IMAGE_NAME:latest"
+          docker push "$DOCKERHUB_USERNAME/$IMAGE_NAME:$RUN_ID"
+          echo "Image: https://hub.docker.com/r/$DOCKERHUB_USERNAME/$IMAGE_NAME" >> "$GITHUB_STEP_SUMMARY"

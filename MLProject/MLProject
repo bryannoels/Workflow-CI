@@ -1,0 +1,19 @@
+name: bigoracle-ci
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_dir: {type: string, default: "codecomplex_preprocessing"}
+      n_estimators: {type: int, default: 100}
+      max_depth: {type: string, default: "20"}      # angka, atau "None" untuk tanpa batas
+      min_samples_leaf: {type: int, default: 2}
+      seed: {type: int, default: 42}
+    command: >
+      python modelling.py
+      --data-dir {data_dir}
+      --n-estimators {n_estimators}
+      --max-depth {max_depth}
+      --min-samples-leaf {min_samples_leaf}
+      --seed {seed}

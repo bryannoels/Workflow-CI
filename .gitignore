@@ -1,0 +1,10 @@
+# MLflow lokal (dibuat saat CI/uji coba)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Python / editor
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
