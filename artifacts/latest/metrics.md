@@ -1,4 +1,4 @@
-## Hasil training (run `4636b2a3e35f4ca3807a7bd399b582ca`)
+## Hasil training (run `4739082445a04493b2a4e8a0bfae6b34`)
 
 | metrik                   |   nilai |
 |:-------------------------|--------:|
@@ -13,4 +13,4 @@
 | test_macro_f1            |  0.4979 |
 | test_weighted_f1         |  0.5084 |
 | train_test_accuracy_gap  |  0.4939 |
-| fit_time_seconds         |  2.419  |
+| fit_time_seconds         |  2.46   |
