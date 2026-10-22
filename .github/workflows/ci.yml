@@ -99,13 +99,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 12. tag docker image (lalu dikirim ke Docker Hub)
+      # 12. tag docker image
       - name: Tag Docker Image
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           docker tag "$IMAGE_NAME" "$DOCKERHUB_USERNAME/$IMAGE_NAME:latest"
           docker tag "$IMAGE_NAME" "$DOCKERHUB_USERNAME/$IMAGE_NAME:$RUN_ID"
+          echo "Tagged:"
+          echo "$DOCKERHUB_USERNAME/$IMAGE_NAME:latest"
+          echo "$DOCKERHUB_USERNAME/$IMAGE_NAME:$RUN_ID"
+
+      # 13. push docker images to Docker Hub
+      - name: Push Docker Image
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
           docker push "$DOCKERHUB_USERNAME/$IMAGE_NAME:latest"
           docker push "$DOCKERHUB_USERNAME/$IMAGE_NAME:$RUN_ID"
           echo "Image: https://hub.docker.com/r/$DOCKERHUB_USERNAME/$IMAGE_NAME" >> "$GITHUB_STEP_SUMMARY"
