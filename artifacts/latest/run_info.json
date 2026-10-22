@@ -1,0 +1,29 @@
+{
+  "run_id": "4636b2a3e35f4ca3807a7bd399b582ca",
+  "run_name": "judicious-mouse-494",
+  "experiment_id": "1",
+  "status": "FINISHED",
+  "collected_at_utc": "2026-10-22T17:12:16+00:00",
+  "git_sha": "df6dbb633e872ff3b83f26e30fba335b611729e2",
+  "params": {
+    "data_dir": "codecomplex_preprocessing",
+    "n_estimators": "100",
+    "max_depth": "20",
+    "min_samples_leaf": "2",
+    "seed": "42"
+  },
+  "metrics": {
+    "training_precision_score": 0.9995981986881914,
+    "training_recall_score": 0.9995979630125972,
+    "training_f1_score": 0.9995979159350155,
+    "training_accuracy_score": 0.9995979630125972,
+    "training_log_loss": 0.1929465607269415,
+    "training_roc_auc": 0.9999865312658837,
+    "training_score": 0.9995979630125972,
+    "test_accuracy_score": 0.5057232049947971,
+    "test_macro_f1": 0.49789513629431986,
+    "test_weighted_f1": 0.5083648209488998,
+    "train_test_accuracy_gap": 0.4938747580178001,
+    "fit_time_seconds": 2.4189558029174805
+  }
+}

@@ -1,0 +1,13 @@
+                      precision    recall  f1-score   support
+
+                O(1)       0.67      0.68      0.67       295
+            O(log n)       0.66      0.61      0.63       282
+                O(n)       0.40      0.48      0.44       316
+          O(n log n)       0.69      0.67      0.68       290
+              O(n^2)       0.42      0.33      0.37       275
+              O(n^3)       0.44      0.38      0.41       250
+NP-hard/eksponensial       0.25      0.33      0.28       214
+
+            accuracy                           0.51      1922
+           macro avg       0.51      0.50      0.50      1922
+        weighted avg       0.52      0.51      0.51      1922

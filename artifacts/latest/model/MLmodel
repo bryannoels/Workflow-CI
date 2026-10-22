@@ -1,0 +1,49 @@
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+is_signature_from_type_hint: false
+mlflow_version: 3.17.1
+model_id: null
+model_size_bytes: 102096938
+model_uuid: 7174674a3ce24c7ca19a661bb41717da
+prompts: null
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "loc", "required": true}, {"type": "double",
+    "name": "n_chars", "required": true}, {"type": "double", "name": "ast_nodes",
+    "required": true}, {"type": "double", "name": "ast_depth", "required": true},
+    {"type": "double", "name": "loop_count", "required": true}, {"type": "double",
+    "name": "for_count", "required": true}, {"type": "double", "name": "while_count",
+    "required": true}, {"type": "double", "name": "comprehension_count", "required":
+    true}, {"type": "double", "name": "max_loop_depth", "required": true}, {"type":
+    "double", "name": "branch_count", "required": true}, {"type": "double", "name":
+    "max_nesting_depth", "required": true}, {"type": "double", "name": "func_count",
+    "required": true}, {"type": "double", "name": "call_count", "required": true},
+    {"type": "double", "name": "max_recursive_calls", "required": true}, {"type":
+    "long", "name": "has_recursion", "required": true}, {"type": "long", "name": "has_sort",
+    "required": true}, {"type": "long", "name": "has_halving", "required": true},
+    {"type": "long", "name": "has_doubling", "required": true}, {"type": "long", "name":
+    "has_binary_search", "required": true}, {"type": "long", "name": "has_heap", "required":
+    true}, {"type": "long", "name": "has_hash_container", "required": true}, {"type":
+    "long", "name": "has_memo", "required": true}, {"type": "long", "name": "is_java",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-10-22 17:12:06.767758'
