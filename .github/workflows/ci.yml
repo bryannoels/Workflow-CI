@@ -7,14 +7,14 @@ on:
       - "MLProject/**"
       - "scripts/**"
       - ".github/workflows/ci.yml"
-  workflow_dispatch:   # dapat dipicu manual dari tab Actions
+  workflow_dispatch: # dapat dipicu manual dari tab Actions
 
 permissions:
-  contents: write      # diperlukan untuk menyimpan artefak ke repositori ini
+  contents: write # diperlukan untuk menyimpan artefak ke repositori ini
 
 env:
   MLFLOW_EXPERIMENT: BigOracle_CI
-  IMAGE_NAME: bigoracle-model
+  IMAGE_NAME: bigoracle
 
 jobs:
   retrain-and-publish:
