@@ -1,0 +1,6 @@
+flask>=3.0
+requests>=2.31
+prometheus-client>=0.20
+psutil>=5.9
+pandas>=2.2
+numpy>=1.26

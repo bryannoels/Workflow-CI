@@ -1,0 +1,45 @@
+# Prometheus + Grafana untuk monitoring BigOracle.
+#   docker compose up -d        -> Prometheus http://127.0.0.1:9090 | Grafana http://127.0.0.1:3000 (admin / admin)
+#   docker compose down         -> hentikan (data Grafana tetap tersimpan di volume)
+#   docker compose down -v      -> hentikan dan hapus data Grafana (termasuk alert dan contact point)
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: bigoracle-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=2d"
+    volumes:
+      - ./2.prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: bigoracle-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      # Email untuk notifikasi alert (opsional). Isi nilainya pada berkas .env (salin dari .env.example).
+      GF_SMTP_ENABLED: ${SMTP_ENABLED:-false}
+      GF_SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com:587}
+      GF_SMTP_USER: ${SMTP_USER:-}
+      GF_SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      GF_SMTP_FROM_ADDRESS: ${SMTP_FROM_ADDRESS:-}
+      GF_SMTP_FROM_NAME: ${SMTP_FROM_NAME:-BigOracle Alerts}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  grafana-data:
